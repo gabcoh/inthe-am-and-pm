@@ -7,6 +7,11 @@ class Tasks{
     constructor(api_key) {
         this.api_key = api_key;
         this.authorized_header = {"Authorization": "Token "+api_key};
+        this.authorized_header_post = {
+            "Authorization": "Token "+api_key,
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        };
     }
     //Promises to return a list of Task objects
     get_tasks(filter) {
@@ -47,6 +52,22 @@ class Tasks{
     task_done(id) {
         fetch("https://inthe.am/api/v2/tasks/" + id + "/", {
             method : "DELETE",
+            headers:this.authorized_header,
+            mode:"cors",
+        });
+    }
+    create_task(new_task) {
+        console.log(JSON.stringify(new_task));
+        fetch("https://inthe.am/api/v2/tasks/", {
+            method : "POST",
+            body : JSON.stringify(new_task),
+            headers:this.authorized_header_post,
+            mode:"cors",
+        }).then(x=>console.log(x));
+    }
+    get_configuration() {
+        return fetch("https://inthe.am/api/v2/user/status/", {
+            method : "GET",
             headers:this.authorized_header,
             mode:"cors",
         });

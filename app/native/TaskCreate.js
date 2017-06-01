@@ -13,14 +13,43 @@ export default class TaskModify extends Component {
     });
     constructor(props) {
         super();
-        console.log('hi');
         this.state = {
             priority:'None',
         };
+        this.create_task = this.create_task.bind(this);
+        this.set = this.set.bind(this);
+    }
+    create_task() {
+        if(this.state.description === undefined) {
+            return;
+        }
+        if(tags === undefined) {
+            var tags = [];
+        } else {
+            var tags = this.state.tags.split(' ');
+        }
+        var priority = this.state.priority;
+        if(priority === "None") {
+            priority = null;
+        }
+        var new_task = {
+            description:this.state.description,
+            priority : priority,
+            tags : tags, 
+        };
+        this.props.navigation.state.params.tasks_source.create_task(new_task);
+        this.props.navigation.navigate('Tasks');
     }
     on_priority_change(value: string) {
         this.setState({
             priority : value
+        });
+    }
+    set(key) {
+        return ((input) => {
+            let t = {};
+            t[key] = input;
+            this.setState(t);
         });
     }
     render() {
@@ -30,12 +59,12 @@ export default class TaskModify extends Component {
             <Content>
                 <Form>
                     <Item>
-                        <Input placeholder='description'/>
+                        <Input onChangeText={this.set('description')} placeholder='description'/>
                     </Item>
                     <Item>
-                        <Input last placeholder="tag, tag, tag..."/>
+                        <Input onChangeText={this.set('tags')} placeholder="tag, tag, tag..."/>
                     </Item>
-                    <Item>
+                    <Item last>
                         <Text>Priority: </Text>
                         <Picker
                         supportedOrientations={['portrait','landscape']}
@@ -50,7 +79,7 @@ export default class TaskModify extends Component {
                         </Picker>
                     </Item>
                 </Form>
-                <Button block style={{ margin: 15, marginTop: 50 }}>
+                <Button block onPress={this.create_task} style={{ margin: 15, marginTop: 50 }}>
                     <Text>Create Task</Text>
                 </Button>
             </Content>

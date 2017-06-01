@@ -3,8 +3,11 @@
  */
 import React, { Component } from 'react';
 import {
-    Container, Header, Title, Content, Footer, FooterTab, Button, Left, Right, Body, Icon, Text, Spinner
+    Container, Header, Title, Content, Footer, FooterTab, Button, Left, Right, Body, Icon, Text, Spinner, Input
 } from 'native-base';
+import {
+    AsyncStorage
+} from 'react-native';
 import TasksView from './TasksView.js';
 import Tasks from '../lib/Tasks.js';
 import TaskModify from './TaskModify.js';
@@ -17,17 +20,28 @@ class RootScreen extends Component {
     };
     constructor(props) {
         super();
+        /*
+        AsyncStorage.getItem('@TaskNinja:api_key').then(key=>{
+            if (key !== null) {
+                this.setState({
+                    tasks_source : new Tasks(api_key),
+                });
+            }
+        });
+        */
         this.state = {
             data : [],
-            //refreshing: false,
-            tasks_source:new Tasks("16549ccb86cf41c8294d9166bdd4dd62a63a0148"),
         };
-    }
-    componentDidMount() {
-        this.update_list();
+        this.render_get_key = this.render_get_key.bind(this);
+        this.render_tasks = this.render_tasks.bind(this);
+        this.update_list = this.update_list.bind(this);
     }
 
     update_list() {
+        console.log(this.state);
+        //this.state.tasks_source.get_configuration().then(response=>response.json()).then(x=>{
+            //this.setState({username:x.username});
+        //});
         this.setState({
             refreshing:true,
             error : false,
@@ -45,7 +59,29 @@ class RootScreen extends Component {
             });
         });
     }
-	render() {
+    render() {
+        if(this.state.tasks_source === undefined) {
+            return this.render_get_key();
+        } else {
+            return this.render_tasks();
+        }
+    }
+    render_get_key() {
+        return (
+            <Container>
+                <Input onChangeText={key=>this.setState({api_key:key})} placeholder="API Key"/>
+                <Button block onPress={()=>{
+                    this.setState({
+                        tasks_source :new Tasks(this.state.api_key),
+                    }, this.update_list);
+                    //AsyncStorage.setItem('@TaskNinja:api_key',this.sate.api_key);
+                }} style={{ margin: 15, marginTop: 50 }}>
+                    <Text>Submit</Text>
+                </Button>
+            </Container>
+        );
+    }
+	render_tasks() {
         const navigate = this.props.navigation;
         if (this.state.error) {
             //var content = <Container><Body><Icon name="ios-sad-outline" style={{color:"red"}}/></Body></Container>;
@@ -64,10 +100,10 @@ class RootScreen extends Component {
 						</Button>
 					</Left>
 						<Body>
-							<Title>Header</Title>
+							<Title>All Tasks</Title>
 						</Body>
 					<Right>
-						<Button transparent onPress={()=>this.props.navigation.navigate('TaskCreate')}>
+						<Button transparent onPress={()=>this.props.navigation.navigate('TaskCreate', {tasks_source:this.state.tasks_source})}>
 							<Icon name='ios-add' />
 						</Button>
                     </Right>
@@ -78,7 +114,7 @@ class RootScreen extends Component {
 				<Footer>
 					<FooterTab>
 						<Button full>
-							<Text>Footer</Text>
+							<Text>{this.state.username}</Text>
 						</Button>
 					</FooterTab>
 				</Footer>

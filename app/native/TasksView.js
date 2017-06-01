@@ -54,7 +54,7 @@ export default class TasksView extends Component {
     }
     render_task_item(task) {
         return(
-            <Swipeout right={this.create_swipeout(task)}>
+            <Swipeout autoClose={true} right={this.create_swipeout(task)}>
             <ListItem button onLongPress={()=>console.log('hi')}onPress={()=>this.navigate('TaskModify', {task:task})}>
             <Body>
             <Text numberofLines={1}>{task.get_title()}</Text>
