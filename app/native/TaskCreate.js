@@ -23,7 +23,7 @@ export default class TaskModify extends Component {
         if(this.state.description === undefined) {
             return;
         }
-        if(tags === undefined) {
+        if(this.state.tags === undefined) {
             var tags = [];
         } else {
             var tags = this.state.tags.split(' ');
@@ -38,7 +38,7 @@ export default class TaskModify extends Component {
             tags : tags, 
         };
         this.props.navigation.state.params.tasks_source.create_task(new_task);
-        this.props.navigation.navigate('Tasks');
+        this.props.navigation.goBack();
     }
     on_priority_change(value: string) {
         this.setState({
