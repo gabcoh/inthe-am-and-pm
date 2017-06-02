@@ -1,5 +1,6 @@
 /*
  * Root componnent for pass app
+ * TODO implement is_valid in Tasks
  */
 import React, { Component } from 'react';
 import {
@@ -20,28 +21,23 @@ class RootScreen extends Component {
     };
     constructor(props) {
         super();
-        /*
-        AsyncStorage.getItem('@TaskNinja:api_key').then(key=>{
-            if (key !== null) {
-                this.setState({
-                    tasks_source : new Tasks(api_key),
-                });
-            }
-        });
-        */
         this.state = {
             data : [],
         };
         this.render_get_key = this.render_get_key.bind(this);
         this.render_tasks = this.render_tasks.bind(this);
         this.update_list = this.update_list.bind(this);
+
+        AsyncStorage.getItem('@TaskNinja:api_key').then(key=>{
+            if (key !== null && new Tasks(key).is_valid()) {
+                this.setState({
+                    tasks_source : new Tasks(key),
+                }, this.update_list);
+            }
+        }).catch(()=>{});
     }
 
     update_list() {
-        console.log(this.state);
-        //this.state.tasks_source.get_configuration().then(response=>response.json()).then(x=>{
-            //this.setState({username:x.username});
-        //});
         this.setState({
             refreshing:true,
             error : false,
@@ -73,8 +69,10 @@ class RootScreen extends Component {
                 <Button block onPress={()=>{
                     this.setState({
                         tasks_source :new Tasks(this.state.api_key),
-                    }, this.update_list);
-                    //AsyncStorage.setItem('@TaskNinja:api_key',this.sate.api_key);
+                    }, () => {
+                        this.update_list();
+                        AsyncStorage.setItem('@TaskNinja:api_key',this.state.api_key);
+                    });
                 }} style={{ margin: 15, marginTop: 50 }}>
                     <Text>Submit</Text>
                 </Button>
@@ -111,13 +109,6 @@ class RootScreen extends Component {
 				<Content>
                     {content}
 				</Content>
-				<Footer>
-					<FooterTab>
-						<Button full>
-							<Text>{this.state.username}</Text>
-						</Button>
-					</FooterTab>
-				</Footer>
 			</Container>
 		);
 	}

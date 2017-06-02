@@ -63,7 +63,7 @@ class Tasks{
             body : JSON.stringify(new_task),
             headers:this.authorized_header_post,
             mode:"cors",
-        }).then(x=>console.log(x));
+        });
     }
     get_configuration() {
         return fetch("https://inthe.am/api/v2/user/status/", {
@@ -71,6 +71,9 @@ class Tasks{
             headers:this.authorized_header,
             mode:"cors",
         });
+    }
+    is_valid() {
+        return true;
     }
 }
 export default Tasks;
